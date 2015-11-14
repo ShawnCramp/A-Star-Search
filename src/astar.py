@@ -25,11 +25,31 @@ to know the locations of the obstacles in the room. Implement an
 A*-based algorithm to compute the path of each robot, from its
 initial position to the given rendezvous point R.
 -------------------------------------------------------------
-"""
+Initial Declarations -------------------------------------"""
 
+
+def coordinates(map_handle):
+    coords = [(i+1, j+1, c) for i, line in enumerate(open(map_handle))
+             for j, c in enumerate(line[0:10])]
+    
+    for coord in coords:
+        print(coord)
+    
+    print('coords')
+    return coords
+
+
+def astar():
+    print('astar')
+    
+
+def branch():
+    print('branch')
 
 
 def main():
+    map_handle = 'layoutmap.txt'
+    coords = coordinates(map_handle)
     print('main')
     
     
