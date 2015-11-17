@@ -32,13 +32,18 @@ from Queue import PriorityQueue
 class Map:
     """
     Map object for holding all nodes in the map, as well as
-    neighbours to each node
+    children to each node
     """
-    def __init__(self):
-        self.edges = {}
+    def __init__(self, width, height, rendevous):
+        self.width = width
+        self.height = height
+        self.rendevous = rendevous
+        self.robots = []
+        
+        self.nodes = {}
 
-    def neighbours(self, id):
-        return self.edges[id]
+    def children(self, node):
+        return self.nodes[node]
 
 
 def map_coordinates(map_handle):
@@ -46,17 +51,43 @@ def map_coordinates(map_handle):
     Create Map object with all coordinates and neighbours
 
     :param map_handle:
+        File handle for Map
     :return:
         Coordinates List
     """
-    coords = [(i+1, j+1, c) for i, line in enumerate(open(map_handle))
-             for j, c in enumerate(line[0:10])]
     
-    for coord in coords:
-        print(coord)
     
-    print('Needs to be implemented with Map Object')
-    return coords
+    
+    ''' List of Robots '''
+    robots = []
+    
+    ''' Floor Coordinates '''
+    nodes = {}
+    
+    ''' Build Map Object '''
+    for i, line in enumerate(open(map_handle)):
+        
+        if i == 0: # when i is 0
+            line = line.strip().split(" ")
+            width = line[0]
+            height = line[1]
+            
+        elif i == 1: # when i is 1
+            line = line.strip().split(" ")
+            robot_count = int(line[0])
+            
+        elif i - 2 < robot_count:
+            robots.append(line.strip().split(" "))
+            
+        elif i == 2 + robot_count:
+            rendevous = line.strip().split(" ")
+            
+        else:
+            print(line)
+            
+    
+    
+    return i
 
 
 def heuristic(g, h):
@@ -72,7 +103,9 @@ def heuristic(g, h):
         Estimated total cost of cheapest
         solution through n
     """
-    print('needs to be implemented')
+    (g1, h1) = g
+    (g2, h2) = h
+    return abs(g1 - g2) + abs(h1 - h2)
 
 
 def a_star(coordinates, rendezvous, robot):
@@ -115,7 +148,8 @@ def a_star(coordinates, rendezvous, robot):
             break
 
         ''' Evaluate neighbouring nodes to current node '''
-        for node in coordinates.neighbours(current_node):
+        for node in coordinates.children(current_node):
+            
             print('temp')
 
     print('Needs to be finished')
@@ -128,11 +162,30 @@ def main():
 
     :return:
     """
+    
+    ''' Create Map Object '''
     map_handle = 'layoutmap.txt'
-    coordinates = map_coordinates(map_handle)
+    # map_structure = map_coordinates(map_handle)
+    
+    ''' 2D Array of nodes in Map '''
+    # coords = [(i+1, j+1, c) for i, line in enumerate(open(map_handle)) for j, c in enumerate(line[0:10])]
+    
+    for i, line in enumerate(open(map_handle)):
+        if i >= 5:
+            print(line)
+            
+    print('testing')
+    map_coordinates(map_handle)
+    
 
-    rendevous = (4, 7)
-    robot_one = (2, 1)
+
+    tiles = {}
+    
+    item = {(1, 1): 'apple'}
+    tiles.update(item)
+    print(tiles[(1, 1)])
+    
+    
 
     print('main')
     
