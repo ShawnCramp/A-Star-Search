@@ -46,6 +46,69 @@ class Map:
         return self.nodes[node]
 
 
+def valid_coordinate(node_set, x, y):
+    """
+    Check if node at node_set[x][y] is a valid node for robots
+    to travel.
+
+    :param node_set:
+    :param x:
+    :param y:
+    :return:
+    """
+    valid = False
+
+    return valid
+
+
+def get_children(node_set, x, y):
+    """
+    Using 2D list of all nodes in the map and an x and y coordinate
+    in the map.  Get the child nodes attached to the x and y
+    coordinate parameter.
+
+    :param list:
+        2D array of all nodes in the map
+    :param x:
+        x coordinate of current node
+    :param y:
+        y coordinate of current node
+    :return children:
+        dictionary of key node and children
+    """
+    temp = []
+    neighbours = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+
+    for value in neighbours:
+        check = node_set[x + value[0]][y + value[1]]
+        if check == 0:
+            temp.append([x + value[0], y + value[1]])
+            #print(temp)
+
+    children = {(x, y): temp}
+    print(children)
+    return children
+
+
+def build_dictionary(node_set):
+    """
+    Build the dictionary of valid nodes and their explorable children.
+
+    :param node_set:
+    :return:
+    """
+    nodes = {}
+
+    for x, x_line in enumerate(node_set):
+        for y, y_line in enumerate(x_line):
+            if node_set[x][y] == 0:
+                #print(node_set[x][y])
+                children = get_children(node_set, x, y)
+                nodes.update(children)
+
+    return nodes
+
+
 def map_coordinates(map_handle):
     """
     Create Map object with all coordinates and neighbours
@@ -55,14 +118,15 @@ def map_coordinates(map_handle):
     :return:
         Coordinates List
     """
-    
-    
-    
+
     ''' List of Robots '''
     robots = []
     
     ''' Floor Coordinates '''
     nodes = {}
+
+    ''' 2D Array to initialize nodes '''
+    temp = []
     
     ''' Build Map Object '''
     for i, line in enumerate(open(map_handle)):
@@ -83,11 +147,13 @@ def map_coordinates(map_handle):
             rendevous = line.strip().split(" ")
             
         else:
-            print(line)
-            
-    
-    
-    return i
+            temp.append(map(int, line.strip()))
+
+    #print(temp)
+
+    x = build_dictionary(temp)
+
+    return temp
 
 
 def heuristic(g, h):
@@ -175,8 +241,8 @@ def main():
             print(line)
             
     print('testing')
-    map_coordinates(map_handle)
-    
+    x = map_coordinates(map_handle)
+    print(x)
 
 
     tiles = {}
