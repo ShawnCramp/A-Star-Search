@@ -144,8 +144,11 @@ def map_coordinates(map_handle):
     ''' List of Robots '''
     robots = []
     
-    ''' Floor Coordinates '''
-    nodes = {}
+    ''' Initial Declarations.  These will be overwritten '''
+    node_dict = {}
+    width = 0
+    height = 0
+    rendezvous = (0, 0)
 
     ''' 2D Array to initialize nodes '''
     temp = []
@@ -243,6 +246,14 @@ def a_star(coordinates, rendezvous, robot):
 
 
 def pretty(d, indent=0):
+    """
+    Print Dictionary to console in a readable fashion
+
+    :param d:
+        Dictionary to print
+    :param indent:
+    :return:
+    """
     for key, value in d.iteritems():
         print '\t' * indent + str(key)
         if isinstance(value, dict):
@@ -280,8 +291,10 @@ def main():
     print('robots: {}'.format(node_map.robots))
     print('dictionary:')
     pretty(node_map.nodes)
+
+    test_node = (4,7)
+    print('\nChild Example: {}: {}'.format(test_node, node_map.children(test_node)))
     
-    
-    
+
 """ Launch Main Program """
 main()
