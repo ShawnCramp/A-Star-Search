@@ -34,19 +34,18 @@ class Map:
     Map object for holding all nodes in the map, as well as
     children to each node
     """
-    def __init__(self, width, height, rendevous):
+    def __init__(self, width, height, rendezvous, robots, node_dict):
         self.width = width
         self.height = height
-        self.rendevous = rendevous
-        self.robots = []
-        
-        self.nodes = {}
+        self.rendezvous = rendezvous
+        self.robots = robots
+        self.nodes = node_dict
 
     def children(self, node):
         return self.nodes[node]
 
 
-def valid_coordinate(node_set, x, y):
+def valid_coordinate(node_set, x, y, shift):
     """
     Check if node at node_set[x][y] is a valid node for robots
     to travel.
@@ -57,7 +56,26 @@ def valid_coordinate(node_set, x, y):
     :return:
     """
     valid = False
-
+    new_x = x + shift[0]
+    new_y = y + shift[1]
+    
+    print('x: {} y: {}'.format(x,y))
+    print('shift: {}'.format(shift))
+    print('new x: {} new y: {}'.format(new_x, new_y))
+    
+    
+    if new_x >= 0 and new_x < len(node_set):
+        if new_y >= 0 and new_y < len(node_set[0]):
+            if node_set[new_x][new_y] == 0:
+                valid = True
+                print('Passed')
+            else:
+                print('Failed')
+        else:
+            print('Failed')
+    else:
+        print('Failed')
+    print('-'*9)
     return valid
 
 
@@ -79,14 +97,15 @@ def get_children(node_set, x, y):
     temp = []
     neighbours = [[1, 0], [0, 1], [-1, 0], [0, -1]]
 
-    for value in neighbours:
-        check = node_set[x + value[0]][y + value[1]]
-        if check == 0:
-            temp.append([x + value[0], y + value[1]])
+    for shift in neighbours:
+        # check = node_set[x + value[0]][y + value[1]]
+        if valid_coordinate(node_set, x, y, shift):
+            temp.append([x + shift[0], y + shift[1]])
             #print(temp)
 
     children = {(x, y): temp}
-    print(children)
+    print('children: {}'.format(children))
+    print('-'*9)
     return children
 
 
@@ -100,6 +119,9 @@ def build_dictionary(node_set):
     nodes = {}
 
     for x, x_line in enumerate(node_set):
+        print('-'*9)
+        print('x line: {} '.format(x_line))
+        print('-'*9)
         for y, y_line in enumerate(x_line):
             if node_set[x][y] == 0:
                 #print(node_set[x][y])
@@ -144,16 +166,14 @@ def map_coordinates(map_handle):
             robots.append(line.strip().split(" "))
             
         elif i == 2 + robot_count:
-            rendevous = line.strip().split(" ")
+            rendezvous = line.strip().split(" ")
             
         else:
             temp.append(map(int, line.strip()))
 
-    #print(temp)
+    node_dict = build_dictionary(temp)
 
-    x = build_dictionary(temp)
-
-    return temp
+    return Map(width, height, rendezvous, robots, node_dict)
 
 
 def heuristic(g, h):
@@ -222,6 +242,15 @@ def a_star(coordinates, rendezvous, robot):
     return found, cost
 
 
+def pretty(d, indent=0):
+    for key, value in d.iteritems():
+        print '\t' * indent + str(key)
+        if isinstance(value, dict):
+            pretty(value, indent+1)
+        else:
+            print '\t' * (indent+1) + str(value)
+
+
 def main():
     """
     Main Loop of Program
@@ -241,19 +270,17 @@ def main():
             print(line)
             
     print('testing')
-    x = map_coordinates(map_handle)
-    print(x)
-
-
-    tiles = {}
+    node_map = map_coordinates(map_handle)
+       
+    print('-'*18)
+    print('mapping data: \n')
+    print('width: {}'.format(node_map.width))
+    print('height: {}'.format(node_map.height))
+    print('rendezvous: {}'.format(node_map.rendezvous))
+    print('robots: {}'.format(node_map.robots))
+    print('dictionary:')
+    pretty(node_map.nodes)
     
-    item = {(1, 1): 'apple'}
-    tiles.update(item)
-    print(tiles[(1, 1)])
-    
-    
-
-    print('main')
     
     
 """ Launch Main Program """
