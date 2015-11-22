@@ -27,6 +27,7 @@ initial position to the given rendezvous point R.
 -------------------------------------------------------------
 Import Declarations --------------------------------------"""
 from Queue import PriorityQueue
+import operator
 
 
 class Map:
@@ -95,13 +96,13 @@ def get_children(node_set, x, y):
         dictionary of key node and children
     """
     temp = []
-    neighbours = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+    neighbours = ((1, 0), (0, 1), (-1, 0), (0, -1))
 
     for shift in neighbours:
-        # check = node_set[x + value[0]][y + value[1]]
+        #  check = node_set[x + value[0]][y + value[1]]
         if valid_coordinate(node_set, x, y, shift):
-            temp.append([x + shift[0], y + shift[1]])
-            #print(temp)
+            temp.append((x + shift[0], y + shift[1]))
+            #  print(temp)
 
     children = {(x, y): temp}
     print('children: {}'.format(children))
@@ -124,7 +125,7 @@ def build_dictionary(node_set):
         print('-'*9)
         for y, y_line in enumerate(x_line):
             if node_set[x][y] == 0:
-                #print(node_set[x][y])
+                #  print(node_set[x][y])
                 children = get_children(node_set, x, y)
                 nodes.update(children)
 
@@ -156,20 +157,20 @@ def map_coordinates(map_handle):
     ''' Build Map Object '''
     for i, line in enumerate(open(map_handle)):
         
-        if i == 0: # when i is 0
+        if i == 0:  # when i is 0
             line = line.strip().split(" ")
             width = line[0]
             height = line[1]
             
-        elif i == 1: # when i is 1
+        elif i == 1:  # when i is 1
             line = line.strip().split(" ")
             robot_count = int(line[0])
             
         elif i - 2 < robot_count:
-            robots.append(line.strip().split(" "))
+            robots.append(tuple(map(int, line.strip().split(" "))))
             
         elif i == 2 + robot_count:
-            rendezvous = line.strip().split(" ")
+            rendezvous = tuple(map(int, line.strip().split(" ")))
             
         else:
             temp.append(map(int, line.strip()))
@@ -197,14 +198,14 @@ def heuristic(g, h):
     return abs(g1 - g2) + abs(h1 - h2)
 
 
-def a_star(coordinates, rendezvous, robot):
+def a_star(coordinates, robot, rendezvous):
     """
     Complete A* Search Algorithm.
 
     :param coordinates:
         Map Coordinates Object
     :param rendezvous:
-        Where the Robots meet.  (Start Node)
+        Where the Robots meet.  (Ending Node Node)
         Eg. (5, 7)
     :param robot:
         Location of Robot.
@@ -225,7 +226,13 @@ def a_star(coordinates, rendezvous, robot):
     frontier = PriorityQueue()
 
     ''' Put Root node into Queue '''
-    frontier.put(rendezvous, cost)
+    frontier.put(robot, cost)
+
+    ''' Initial Dictionaries '''
+    came_from = {}
+    cost_so_far = {}
+    came_from[robot] = None
+    cost_so_far[robot] = 0
 
     ''' Loop through Queue '''
     while not frontier.empty():
@@ -233,16 +240,33 @@ def a_star(coordinates, rendezvous, robot):
 
         ''' If current node is robot node,
         break and return true -------- '''
-        if current_node == robot:
+        if current_node == rendezvous:
             break
 
         ''' Evaluate neighbouring nodes to current node '''
         for node in coordinates.children(current_node):
-            
-            print('temp')
+            print('Current: {}'.format(current_node))
+            print('Currently Evaling Child: {}'.format(node))
+            new_cost = cost_so_far[current_node] + 1
 
-    print('Needs to be finished')
-    return found, cost
+            if node not in cost_so_far or new_cost < cost_so_far[node]:
+                print('If Check: Passed')
+
+                cost_so_far[node] = new_cost
+                priority = new_cost + heuristic(rendezvous, node)
+                frontier.put(node, priority)
+
+                print('Node Priority: {}'.format(priority))
+                print('Frontier Size: {}'.format(frontier.qsize()))
+
+                came_from[node] = current_node
+                print('-'*9)
+            else:
+                print('If Check: Failed')
+                print('Frontier Size: {}'.format(frontier.qsize()))
+                print('-'*9)
+
+    return came_from, cost_so_far
 
 
 def pretty(d, indent=0):
@@ -270,7 +294,7 @@ def main():
     """
     
     ''' Create Map Object '''
-    map_handle = 'layoutmap.txt'
+    map_handle = 'layoutmap2.txt'
     # map_structure = map_coordinates(map_handle)
     
     ''' 2D Array of nodes in Map '''
@@ -292,8 +316,29 @@ def main():
     print('dictionary:')
     pretty(node_map.nodes)
 
-    test_node = (4,7)
+    test_node = (2, 0)
     print('\nChild Example: {}: {}'.format(test_node, node_map.children(test_node)))
+
+    print('-'*18)
+    print(node_map.robots[0])
+    print(node_map.rendezvous)
+    came_from, cost_so_far = a_star(node_map, node_map.robots[0], node_map.rendezvous)
+    # came_from, cost_so_far = a_star(node_map.nodes, (2, 1), (4, 7))
+    print('Travelled Nodes: ')
+    print(came_from)
+    print('Evaluated Nodes: ')
+    print(cost_so_far)
+
+    print('-'*18)
+    total = 0
+    for k, c in cost_so_far:
+        total += c
+    print('Total: {}'.format(total))
+
+    print('-'*18)
+    sorted_dict = sorted(cost_so_far.items(), key=operator.itemgetter(1))
+    print('')
+    print(sorted_dict)
     
 
 """ Launch Main Program """
