@@ -320,24 +320,33 @@ def main():
     print('\nChild Example: {}: {}'.format(test_node, node_map.children(test_node)))
 
     print('-'*18)
-    print(node_map.robots[0])
-    print(node_map.rendezvous)
+    print('Robot being Evaluated: {}'.format(node_map.robots[0]))
+    print('Rendezvous Node: {}'.format(node_map.rendezvous))
+    print('-'*40)
+    print('Performing A* Search...')
+    print('-'*40)
     came_from, cost_so_far = a_star(node_map, node_map.robots[0], node_map.rendezvous)
+    print('-'*40)
+    print('A* Complete...')
+    print('Robot being Evaluated: {}'.format(node_map.robots[0]))
+    print('Rendezvous Node: {}'.format(node_map.rendezvous))
+    print('-'*40)
     # came_from, cost_so_far = a_star(node_map.nodes, (2, 1), (4, 7))
     print('Travelled Nodes: ')
     print(came_from)
-    print('Evaluated Nodes: ')
+    print('Evaluated Nodes ( Integer value is cost to get there ): ')
     print(cost_so_far)
 
     print('-'*18)
     total = 0
     for k, c in cost_so_far:
         total += c
-    print('Total: {}'.format(total))
+    print('Total Cost of Steps Travelled: {}'.format(total))
+    print('Cost to get to rendezvous Node: {}'.format(cost_so_far[node_map.rendezvous]))
 
     print('-'*18)
     sorted_dict = sorted(cost_so_far.items(), key=operator.itemgetter(1))
-    print('')
+    print('Sorted Dictionary:')
     print(sorted_dict)
     
 
