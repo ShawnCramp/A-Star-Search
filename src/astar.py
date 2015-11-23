@@ -6,6 +6,8 @@ Author: Edward Huang
 ID: 100949380
 Author: Bruno Salapic
 ID: 100574460
+Author: Konrad Bania
+ID: 110447960
 
 Description: CP468 Final Assignment
 Date: November, 13th, 2015
@@ -26,8 +28,25 @@ A*-based algorithm to compute the path of each robot, from its
 initial position to the given rendezvous point R.
 -------------------------------------------------------------
 Import Declarations --------------------------------------"""
-from Queue import PriorityQueue
+#  from Queue import PriorityQueue
 import operator
+import heapq
+
+class PriorityQueue:
+    def __init__(self):
+        self._values = []
+        
+    def empty(self):
+        return len(self._values) == 0
+    
+    def length(self):
+        return len(self._values)
+    
+    def put(self, item, priority):
+        heapq.heappush(self._values, (priority, item))
+        
+    def get(self):
+        return heapq.heappop(self._values)[1]
 
 
 class Map:
@@ -35,15 +54,29 @@ class Map:
     Map object for holding all nodes in the map, as well as
     children to each node
     """
-    def __init__(self, width, height, rendezvous, robots, node_dict):
+    def __init__(self, width, height, rendezvous, robots, layout, node_dict):
         self.width = width
         self.height = height
         self.rendezvous = rendezvous
         self.robots = robots
+        self.layout = layout
         self.nodes = node_dict
 
     def children(self, node):
         return self.nodes[node]
+    
+
+class Robot:
+    """
+    Robot object for holding robot paths and locations
+    """
+    def __init__(self, start, finish):
+        self.start = start
+        self.finish = finish
+        self.current = start
+        self.frontier = PriorityQueue()
+        self.came_from = {}
+        self.cost_so_far = {}
 
 
 def valid_coordinate(node_set, x, y, shift):
@@ -118,18 +151,21 @@ def build_dictionary(node_set):
     :return:
     """
     nodes = {}
+    layout = {}
 
     for x, x_line in enumerate(node_set):
         print('-'*9)
         print('x line: {} '.format(x_line))
         print('-'*9)
-        for y, y_line in enumerate(x_line):
+        for y, y_line in enumerate(x_line):      
             if node_set[x][y] == 0:
-                #  print(node_set[x][y])
+                layout[(x, y)] = '.' #  for drawing
                 children = get_children(node_set, x, y)
                 nodes.update(children)
+            elif node_set[x][y] == 1:
+                layout[(x, y)] = '#' #  for drawing
 
-    return nodes
+    return nodes, layout
 
 
 def map_coordinates(map_handle):
@@ -175,9 +211,9 @@ def map_coordinates(map_handle):
         else:
             temp.append(map(int, line.strip()))
 
-    node_dict = build_dictionary(temp)
+    node_dict, layout = build_dictionary(temp)
 
-    return Map(width, height, rendezvous, robots, node_dict)
+    return Map(width, height, rendezvous, robots, layout, node_dict)
 
 
 def heuristic(g, h):
@@ -217,18 +253,21 @@ def a_star(coordinates, robot, rendezvous):
     """
 
     ''' Cost of Initial Node '''
-    cost = 0
-
-    ''' Robot found boolean '''
-    found = False
+    priority = 0
 
     ''' Priority Queue for evaluating locations '''
     frontier = PriorityQueue()
 
     ''' Put Root node into Queue '''
-    frontier.put(robot, cost)
+    frontier.put(robot, priority)
 
-    ''' Initial Dictionaries '''
+    ''' Initialize Robots '''
+    robots = [] #  working on implementation of multiple robots
+    for init in robot:
+        robots.append(Robot(init, rendezvous))
+        
+    print(robots)
+        
     came_from = {}
     cost_so_far = {}
     came_from[robot] = None
@@ -248,22 +287,23 @@ def a_star(coordinates, robot, rendezvous):
             print('Current: {}'.format(current_node))
             print('Currently Evaling Child: {}'.format(node))
             new_cost = cost_so_far[current_node] + 1
-
+            print('New Cost for Node: {}'.format(new_cost))
             if node not in cost_so_far or new_cost < cost_so_far[node]:
                 print('If Check: Passed')
 
                 cost_so_far[node] = new_cost
                 priority = new_cost + heuristic(rendezvous, node)
+                
                 frontier.put(node, priority)
 
                 print('Node Priority: {}'.format(priority))
-                print('Frontier Size: {}'.format(frontier.qsize()))
+                print('Frontier Size: {}'.format(frontier.length()))
 
                 came_from[node] = current_node
                 print('-'*9)
             else:
                 print('If Check: Failed')
-                print('Frontier Size: {}'.format(frontier.qsize()))
+                print('Frontier Size: {}'.format(frontier.length()))
                 print('-'*9)
 
     return came_from, cost_so_far
@@ -348,6 +388,35 @@ def main():
     sorted_dict = sorted(cost_so_far.items(), key=operator.itemgetter(1))
     print('Sorted Dictionary:')
     print(sorted_dict)
+    
+    print('-'*18)
+    print('Node Costs')
+    for key, val in cost_so_far.iteritems():
+        print('{}: {}'.format(key, val))
+        node_map.layout[key] = val
+    
+    print('-'*18)
+    
+    array = []
+    for i in range(0, 8):
+        temp = []
+        for j in range(0, 10):
+            temp.append(9)
+        array.append(temp)
+        
+    for i in array:
+        print(i)
+    
+    for key, val in node_map.layout.iteritems():
+        print('{}: {}'.format(key, val))
+        array[key[0]][key[1]] = val
+        
+    print('-'*18)
+    print('Layout Map by Cost')
+    print('#: Wall     . : UnExplored Floor Space\n')
+    for i in array:
+            print('{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}'.format(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9]))
+    
     
 
 """ Launch Main Program """
