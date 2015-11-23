@@ -233,20 +233,7 @@ def heuristic(g, h, distance):
         Estimated total cost of cheapest
         solution through n
     """
-
-    '''
-    (g1, h1) = g
-    (g2, h2) = h
-    abs(g1 - g2) + abs(h1 - h2)
-    '''
-    print('{} {} {} {}'.format(g[0], g[1], h[0], h[1]))
-    new_g = abs(h[0] - g[0]) ^ 2
-    print(new_g)
-    new_h = abs(h[1] - g[1]) ^ 2
-    print(new_h)
-    sqrt = math.sqrt(new_g + new_h)
-
-    return sqrt + distance
+    return math.sqrt((abs(h[0] - g[0]) ** 2) + (abs(h[1] - g[1]) ** 2)) + distance
 
 
 def a_star(coordinates, robot, rendezvous):
