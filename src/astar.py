@@ -31,6 +31,8 @@ Import Declarations --------------------------------------"""
 #  from Queue import PriorityQueue
 import operator
 import heapq
+import math
+
 
 class PriorityQueue:
     def __init__(self):
@@ -216,22 +218,35 @@ def map_coordinates(map_handle):
     return Map(width, height, rendezvous, robots, layout, node_dict)
 
 
-def heuristic(g, h):
+def heuristic(g, h, distance):
     """
     A* Heuristic
     f(n) = g(n) + h(n)
 
     :param g:
         Cost to reach node from start
+        Eg. (2, 1)
     :param h:
         Estimated cost to get from n to goal
+        Eg. (4, 7)
     :return f(n):
         Estimated total cost of cheapest
         solution through n
     """
+
+    '''
     (g1, h1) = g
     (g2, h2) = h
-    return abs(g1 - g2) + abs(h1 - h2)
+    abs(g1 - g2) + abs(h1 - h2)
+    '''
+    print('{} {} {} {}'.format(g[0], g[1], h[0], h[1]))
+    new_g = abs(h[0] - g[0]) ^ 2
+    print(new_g)
+    new_h = abs(h[1] - g[1]) ^ 2
+    print(new_h)
+    sqrt = math.sqrt(new_g + new_h)
+
+    return sqrt + distance
 
 
 def a_star(coordinates, robot, rendezvous):
@@ -262,7 +277,7 @@ def a_star(coordinates, robot, rendezvous):
     frontier.put(robot, priority)
 
     ''' Initialize Robots '''
-    robots = [] #  working on implementation of multiple robots
+    robots = []  # working on implementation of multiple robots
     for init in robot:
         robots.append(Robot(init, rendezvous))
         
@@ -292,8 +307,8 @@ def a_star(coordinates, robot, rendezvous):
                 print('If Check: Passed')
 
                 cost_so_far[node] = new_cost
-                priority = new_cost + heuristic(rendezvous, node)
-                
+                priority = new_cost + heuristic(node, rendezvous, new_cost)
+
                 frontier.put(node, priority)
 
                 print('Node Priority: {}'.format(priority))
@@ -416,7 +431,8 @@ def main():
     print('#: Wall     . : UnExplored Floor Space\n')
     for i in array:
             print('{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}'.format(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9]))
-    
+
+    print('-'*18)
     
 
 """ Launch Main Program """
