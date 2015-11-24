@@ -1,5 +1,4 @@
-"""
--------------------------------------------------------------
+""" ---------------------------------------------------------
 Author: Shawn Cramp
 ID: 111007290
 Author: Edward Huang
@@ -72,13 +71,40 @@ class Robot:
     """
     Robot object for holding robot paths and locations
     """
-    def __init__(self, start, finish):
+    def __init__(self, start, finish, came_from, cost_so_far, path_cost):
         self.start = start
         self.finish = finish
-        self.current = start
-        self.frontier = PriorityQueue()
-        self.came_from = {}
-        self.cost_so_far = {}
+        self.path_cost = path_cost
+        self.came_from = came_from
+        self.cost_so_far = cost_so_far
+        
+    def path(self):
+        print('path temp')
+        
+    def pprint(self, layout):
+        print('Node Costs')
+        for key, val in self.cost_so_far.iteritems():
+            print('{}: {}'.format(key, val))
+            layout[key] = val
+        
+        array = []
+        for i in range(0, 8):
+            temp = []
+            for j in range(0, 10):
+                temp.append(9)
+            array.append(temp)
+            
+        for i in array:
+            print(i)
+        
+        for key, val in layout.iteritems():
+            print('{}: {}'.format(key, val))
+            array[key[0]][key[1]] = val
+        
+        print('Layout Map by Cost')
+        print('#: Wall     . : UnExplored Floor Space\n')
+        for i in array:
+            print('{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}'.format(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9]))
 
 
 def valid_coordinate(node_set, x, y, shift):
@@ -263,13 +289,7 @@ def a_star(coordinates, robot, rendezvous):
     ''' Put Root node into Queue '''
     frontier.put(robot, priority)
 
-    ''' Initialize Robots '''
-    robots = []  # working on implementation of multiple robots
-    for init in robot:
-        robots.append(Robot(init, rendezvous))
-        
-    print(robots)
-        
+    ''' Initialize '''
     came_from = {}
     cost_so_far = {}
     came_from[robot] = None
@@ -350,12 +370,12 @@ def main():
     node_map = map_coordinates(map_handle)
        
     print('-'*18)
-    print('mapping data: \n')
-    print('width: {}'.format(node_map.width))
-    print('height: {}'.format(node_map.height))
-    print('rendezvous: {}'.format(node_map.rendezvous))
-    print('robots: {}'.format(node_map.robots))
-    print('dictionary:')
+    print('Mapping Data: \n')
+    print('Width: {:>10}'.format(node_map.width))
+    print('Height: {:>10}'.format(node_map.height))
+    print('Rendezvous: {:>10}'.format(node_map.rendezvous))
+    print('Robots: {:>10}'.format(node_map.robots))
+    print('Dictionary:')
     pretty(node_map.nodes)
 
     test_node = (2, 0)
@@ -367,59 +387,21 @@ def main():
     print('-'*40)
     print('Performing A* Search...')
     print('-'*40)
-    came_from, cost_so_far = a_star(node_map, node_map.robots[0], node_map.rendezvous)
+    
+    robots = []
+    for robot_start in node_map.robots:
+        came_from, cost_so_far = a_star(node_map, robot_start, node_map.rendezvous)
+        robots.append(Robot(robot_start, node_map.rendezvous, came_from, cost_so_far, cost_so_far[node_map.rendezvous]))
+    
     print('-'*40)
     print('A* Complete...')
     print('Robot being Evaluated: {}'.format(node_map.robots[0]))
     print('Rendezvous Node: {}'.format(node_map.rendezvous))
     print('-'*40)
-    # came_from, cost_so_far = a_star(node_map.nodes, (2, 1), (4, 7))
-    print('Travelled Nodes: ')
-    print(came_from)
-    print('Evaluated Nodes ( Integer value is cost to get there ): ')
-    print(cost_so_far)
-
-    print('-'*18)
-    total = 0
-    for k, c in cost_so_far:
-        total += c
-    print('Total Cost of Steps Travelled: {}'.format(total))
-    print('Cost to get to rendezvous Node: {}'.format(cost_so_far[node_map.rendezvous]))
-
-    print('-'*18)
-    sorted_dict = sorted(cost_so_far.items(), key=operator.itemgetter(1))
-    print('Sorted Dictionary:')
-    print(sorted_dict)
     
-    print('-'*18)
-    print('Node Costs')
-    for key, val in cost_so_far.iteritems():
-        print('{}: {}'.format(key, val))
-        node_map.layout[key] = val
-    
-    print('-'*18)
-    
-    array = []
-    for i in range(0, 8):
-        temp = []
-        for j in range(0, 10):
-            temp.append(9)
-        array.append(temp)
-        
-    for i in array:
-        print(i)
-    
-    for key, val in node_map.layout.iteritems():
-        print('{}: {}'.format(key, val))
-        array[key[0]][key[1]] = val
-        
-    print('-'*18)
-    print('Layout Map by Cost')
-    print('#: Wall     . : UnExplored Floor Space\n')
-    for i in array:
-            print('{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}'.format(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9]))
-
-    print('-'*18)
+    for guy in robots:
+        guy.pprint(node_map.layout)
+      
     
 
 """ Launch Main Program """
