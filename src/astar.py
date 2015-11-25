@@ -26,12 +26,14 @@ to know the locations of the obstacles in the room. Implement an
 A*-based algorithm to compute the path of each robot, from its
 initial position to the given rendezvous point R.
 -------------------------------------------------------------
-Import Declarations --------------------------------------"""
-#  from Queue import PriorityQueue
-import operator
+Import Declarations ------------------------------------- """
 import heapq
 import math
 import copy
+
+
+""" ---------------------------------------------------------
+Class Declarations -------------------------------------- """
 
 
 class PriorityQueue:
@@ -85,24 +87,24 @@ class Robot:
         pathing = [node]
         while distance != -1:
             node = pathing[-1]
-            print('Checking Children of Node: {}'.format(node))
-            print('Distance: {}'.format(distance))
+            # print('Checking Children of Node: {}'.format(node))
+            # print('Distance: {}'.format(distance))
             children = node_map.children(node)
-            print('Node Children: {}'.format(children))
+            # print('Node Children: {}'.format(children))
             for child in children:
                 if child in self.cost_so_far.keys():
-                    print('Child Cost: {}: {}'.format(child, self.cost_so_far[child]))
+                    # print('Child Cost: {}: {}'.format(child, self.cost_so_far[child]))
                     if self.cost_so_far[child] == distance:
-                        print('If Check: Passed')
+                        # print('If Check: Passed')
                         pathing.append(child)
-
                         break
                     else:
-                        print('If Check: Failed')
+                        pass
+                        # print('If Check: Failed')
             distance -= 1
-            print('-'*18)
+            # print('-'*18)
         
-        return pathing
+        return list(reversed(pathing))
         
     def pprint(self, layout):
         print('Node Costs')
@@ -130,6 +132,10 @@ class Robot:
             print('{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}'.format(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9],i[10], i[11], i[12], i[13], i[14], i[15], i[16], i[17], i[18], i[19],i[20], i[21], i[22], i[23], i[24], i[25], i[26], i[27], i[28], i[29]))
 
 
+""" ---------------------------------------------------------
+Function Declarations ----------------------------------- """
+
+
 def valid_coordinate(node_set, x, y, shift):
     """
     Check if node at node_set[x][y] is a valid node for robots
@@ -143,24 +149,15 @@ def valid_coordinate(node_set, x, y, shift):
     valid = False
     new_x = x + shift[0]
     new_y = y + shift[1]
-    
-    print('x: {} y: {}'.format(x,y))
-    print('shift: {}'.format(shift))
-    print('new x: {} new y: {}'.format(new_x, new_y))
-    
-    
-    if new_x >= 0 and new_x < len(node_set):
-        if new_y >= 0 and new_y < len(node_set[0]):
-            if node_set[new_x][new_y] == 0:
-                valid = True
-                print('Passed')
-            else:
-                print('Failed')
+
+    if (new_x >= 0 and new_x < len(node_set)) and (new_y >= 0 and new_y < len(node_set[0])):
+        if node_set[new_x][new_y] == 0:
+            valid = True
         else:
-            print('Failed')
+            pass
     else:
-        print('Failed')
-    print('-'*9)
+        pass
+
     return valid
 
 
@@ -170,7 +167,7 @@ def get_children(node_set, x, y):
     in the map.  Get the child nodes attached to the x and y
     coordinate parameter.
 
-    :param list:
+    :param node_set:
         2D array of all nodes in the map
     :param x:
         x coordinate of current node
@@ -189,8 +186,6 @@ def get_children(node_set, x, y):
             #  print(temp)
 
     children = {(x, y): temp}
-    print('children: {}'.format(children))
-    print('-'*9)
     return children
 
 
@@ -205,16 +200,13 @@ def build_dictionary(node_set):
     layout = {}
 
     for x, x_line in enumerate(node_set):
-        print('-'*9)
-        print('x line: {} '.format(x_line))
-        print('-'*9)
         for y, y_line in enumerate(x_line):      
             if node_set[x][y] == 0:
-                layout[(x, y)] = '.' #  for drawing
+                layout[(x, y)] = '.'  # for drawing
                 children = get_children(node_set, x, y)
                 nodes.update(children)
             elif node_set[x][y] == 1:
-                layout[(x, y)] = '#' #  for drawing
+                layout[(x, y)] = '#'  # for drawing
 
     return nodes, layout
 
@@ -329,27 +321,28 @@ def a_star(coordinates, robot, rendezvous):
 
         ''' Evaluate neighbouring nodes to current node '''
         for node in coordinates.children(current_node):
-            print('Current: {}'.format(current_node))
-            print('Currently Evaling Child: {}'.format(node))
+            # print('Current: {}'.format(current_node))
+            # print('Currently Evaling Child: {}'.format(node))
             new_cost = cost_so_far[current_node] + 1
-            print('New Cost for Node: {}'.format(new_cost))
+            # print('New Cost for Node: {}'.format(new_cost))
             if node not in cost_so_far or new_cost < cost_so_far[node]:
-                print('If Check: Passed')
+                # print('If Check: Passed')
 
                 cost_so_far[node] = new_cost
                 priority = new_cost + heuristic(node, rendezvous, new_cost)
 
                 frontier.put(node, priority)
 
-                print('Node Priority: {}'.format(priority))
-                print('Frontier Size: {}'.format(frontier.length()))
+                # print('Node Priority: {}'.format(priority))
+                # print('Frontier Size: {}'.format(frontier.length()))
 
                 came_from[node] = current_node
-                print('-'*9)
+                # print('-'*9)
             else:
-                print('If Check: Failed')
-                print('Frontier Size: {}'.format(frontier.length()))
-                print('-'*9)
+                pass
+                # print('If Check: Failed')
+                # print('Frontier Size: {}'.format(frontier.length()))
+                # print('-'*9)
 
     return came_from, cost_so_far
 
@@ -371,6 +364,15 @@ def pretty(d, indent=0):
             print '\t' * (indent+1) + str(value)
 
 
+def init_robots(node_map):
+    robots = []
+    for robot_start in node_map.robots:
+        came_from, cost_so_far = a_star(node_map, robot_start, node_map.rendezvous)
+        robots.append(Robot(robot_start, node_map.rendezvous, came_from, cost_so_far, cost_so_far[node_map.rendezvous]))
+
+    return robots
+
+
 def main():
     """
     Main Loop of Program
@@ -379,20 +381,10 @@ def main():
     """
     
     ''' Create Map Object '''
-    map_handle = 'layoutmap.txt'
-    # map_structure = map_coordinates(map_handle)
+    map_handle = 'layoutmap4.txt'
     
     ''' 2D Array of nodes in Map '''
-    # coords = [(i+1, j+1, c) for i, line in enumerate(open(map_handle)) for j, c in enumerate(line[0:10])]
-    
-    for i, line in enumerate(open(map_handle)):
-        if i >= 5:
-            print(line)
-            
-    print('testing')
     node_map = map_coordinates(map_handle)
-       
-    print('-'*18)
     print('Mapping Data: \n')
     print('Width: {:>10}'.format(node_map.width))
     print('Height: {:>10}'.format(node_map.height))
@@ -400,19 +392,11 @@ def main():
     print('Robots: {:>10}'.format(node_map.robots))
     print('Dictionary:')
     pretty(node_map.nodes)
-    
-    print('-'*18)
-    print('Robot being Evaluated: {}'.format(node_map.robots[0]))
-    print('Rendezvous Node: {}'.format(node_map.rendezvous))
-    print('-'*40)
+    print('-'*40 + '\n')
     print('Performing A* Search...')
     print('-'*40)
-    
-    robots = []
-    for robot_start in node_map.robots:
-        came_from, cost_so_far = a_star(node_map, robot_start, node_map.rendezvous)
-        robots.append(Robot(robot_start, node_map.rendezvous, came_from, cost_so_far, cost_so_far[node_map.rendezvous]))
-    
+    robots = init_robots(node_map)
+    print('...')
     print('-'*40)
     print('A* Complete...')
     print('Robot being Evaluated: {}'.format(node_map.robots[0]))
@@ -420,12 +404,14 @@ def main():
     print('-'*40)
 
     for guy in robots:
+        print('Evaluating Robot: {} -> {}'.format(guy.start, guy.finish))
         temp = copy.deepcopy(node_map.layout)
         # guy.pprint(temp)
         temp = copy.deepcopy(node_map)
         print('One Optimal Path:')
         print(guy.path(temp))
-        #print(guy.cost_so_far.keys())
+        # print(guy.cost_so_far.keys())
+        print('-'*18)
     
 
 """ Launch Main Program """
