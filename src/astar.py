@@ -31,6 +31,7 @@ Import Declarations --------------------------------------"""
 import operator
 import heapq
 import math
+import copy
 
 
 class PriorityQueue:
@@ -78,8 +79,24 @@ class Robot:
         self.came_from = came_from
         self.cost_so_far = cost_so_far
         
-    def path(self):
-        print('path temp')
+    def path(self, node_map):
+        distance = copy.deepcopy(self.path_cost)
+        node = copy.deepcopy(self.finish)
+        pathing = [node]
+        while distance != 0:
+            node = pathing[-1]
+            children = node_map.children(node)
+            for child in children:
+                if child in self.cost_so_far.keys():
+                    if self.cost_so_far[node] == distance:
+                        print('If Check: Passed')
+                        pathing.append(child)
+                        distance -= 1
+                        break
+                    else:
+                        print('If Check: Failed')
+        
+        return pathing
         
     def pprint(self, layout):
         print('Node Costs')
@@ -88,9 +105,9 @@ class Robot:
             layout[key] = val
         
         array = []
-        for i in range(0, 8):
+        for i in range(0, 20):
             temp = []
-            for j in range(0, 10):
+            for j in range(0, 30):
                 temp.append(9)
             array.append(temp)
             
@@ -104,7 +121,7 @@ class Robot:
         print('Layout Map by Cost')
         print('#: Wall     . : UnExplored Floor Space\n')
         for i in array:
-            print('{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}'.format(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9]))
+            print('{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}'.format(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9],i[10], i[11], i[12], i[13], i[14], i[15], i[16], i[17], i[18], i[19],i[20], i[21], i[22], i[23], i[24], i[25], i[26], i[27], i[28], i[29]))
 
 
 def valid_coordinate(node_set, x, y, shift):
@@ -356,7 +373,7 @@ def main():
     """
     
     ''' Create Map Object '''
-    map_handle = 'layoutmap2.txt'
+    map_handle = 'layoutmap3.txt'
     # map_structure = map_coordinates(map_handle)
     
     ''' 2D Array of nodes in Map '''
@@ -377,10 +394,7 @@ def main():
     print('Robots: {:>10}'.format(node_map.robots))
     print('Dictionary:')
     pretty(node_map.nodes)
-
-    test_node = (2, 0)
-    print('\nChild Example: {}: {}'.format(test_node, node_map.children(test_node)))
-
+    
     print('-'*18)
     print('Robot being Evaluated: {}'.format(node_map.robots[0]))
     print('Rendezvous Node: {}'.format(node_map.rendezvous))
@@ -399,9 +413,16 @@ def main():
     print('Rendezvous Node: {}'.format(node_map.rendezvous))
     print('-'*40)
     
+    
     for guy in robots:
-        guy.pprint(node_map.layout)
-      
+        temp = copy.deepcopy(node_map.layout)
+        guy.pprint(temp)
+        temp = copy.deepcopy(node_map)
+        print(guy.path(temp))
+        
+        
+    print('-'*40)
+    
     
 
 """ Launch Main Program """
