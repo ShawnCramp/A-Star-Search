@@ -83,18 +83,24 @@ class Robot:
         distance = copy.deepcopy(self.path_cost)
         node = copy.deepcopy(self.finish)
         pathing = [node]
-        while distance != 0:
+        while distance != -1:
             node = pathing[-1]
+            print('Checking Children of Node: {}'.format(node))
+            print('Distance: {}'.format(distance))
             children = node_map.children(node)
+            print('Node Children: {}'.format(children))
             for child in children:
                 if child in self.cost_so_far.keys():
-                    if self.cost_so_far[node] == distance:
+                    print('Child Cost: {}: {}'.format(child, self.cost_so_far[child]))
+                    if self.cost_so_far[child] == distance:
                         print('If Check: Passed')
                         pathing.append(child)
-                        distance -= 1
+
                         break
                     else:
                         print('If Check: Failed')
+            distance -= 1
+            print('-'*18)
         
         return pathing
         
@@ -373,7 +379,7 @@ def main():
     """
     
     ''' Create Map Object '''
-    map_handle = 'layoutmap3.txt'
+    map_handle = 'layoutmap.txt'
     # map_structure = map_coordinates(map_handle)
     
     ''' 2D Array of nodes in Map '''
@@ -412,17 +418,14 @@ def main():
     print('Robot being Evaluated: {}'.format(node_map.robots[0]))
     print('Rendezvous Node: {}'.format(node_map.rendezvous))
     print('-'*40)
-    
-    
+
     for guy in robots:
         temp = copy.deepcopy(node_map.layout)
-        guy.pprint(temp)
+        # guy.pprint(temp)
         temp = copy.deepcopy(node_map)
+        print('One Optimal Path:')
         print(guy.path(temp))
-        
-        
-    print('-'*40)
-    
+        #print(guy.cost_so_far.keys())
     
 
 """ Launch Main Program """
