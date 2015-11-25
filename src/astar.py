@@ -75,13 +75,19 @@ class Robot:
     Robot object for holding robot paths and locations
     """
     def __init__(self, start, finish, came_from, cost_so_far, path_cost):
+        """
+        Temp Comment
+        """
         self.start = start
         self.finish = finish
         self.path_cost = path_cost
         self.came_from = came_from
         self.cost_so_far = cost_so_far
         
-    def path(self, node_map):
+    def backtrack_search(self, node_map):
+        """
+        Temp Comment
+        """
         distance = copy.deepcopy(self.path_cost)
         node = copy.deepcopy(self.finish)
         pathing = [node]
@@ -381,7 +387,7 @@ def main():
     """
     
     ''' Create Map Object '''
-    map_handle = 'layoutmap4.txt'
+    map_handle = 'maps/layoutmap.txt'
     
     ''' 2D Array of nodes in Map '''
     node_map = map_coordinates(map_handle)
@@ -409,7 +415,7 @@ def main():
         # guy.pprint(temp)
         temp = copy.deepcopy(node_map)
         print('One Optimal Path:')
-        print(guy.path(temp))
+        print(guy.backtrack_search(temp))
         # print(guy.cost_so_far.keys())
         print('-'*18)
     
