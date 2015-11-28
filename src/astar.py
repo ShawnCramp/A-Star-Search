@@ -30,6 +30,9 @@ Import Declarations ------------------------------------- """
 import heapq
 import math
 import copy
+import sys
+import os
+import time
 
 
 """ ---------------------------------------------------------
@@ -353,23 +356,6 @@ def a_star(coordinates, robot, rendezvous):
     return came_from, cost_so_far
 
 
-def pretty(d, indent=0):
-    """
-    Print Dictionary to console in a readable fashion
-
-    :param d:
-        Dictionary to print
-    :param indent:
-    :return:
-    """
-    for key, value in d.iteritems():
-        print '\t' * indent + str(key)
-        if isinstance(value, dict):
-            pretty(value, indent+1)
-        else:
-            print '\t' * (indent+1) + str(value)
-
-
 def init_robots(node_map):
     robots = []
     for robot_start in node_map.robots:
@@ -379,46 +365,115 @@ def init_robots(node_map):
     return robots
 
 
+""" ---------------------------------------------------------
+Console Execution Functions ---------------------------------
+
+All functions below are used for execution of the program and
+are no involved in the logical process.
+
+The Main function will be called upon code execution and the
+user will be presented with a list of options on how to
+proceed and view the code output he/she would like to view.
+
+-------------------------------------------------------------
+--------------------------------------------------------- """
+
+
+def map_details(node_map):
+    print('Mapping Data: \n')
+    print('Width: {:>10}'.format(node_map.width))
+    print('Height: {:>10}'.format(node_map.height))
+    print('Rendezvous: {:>10}'.format(node_map.rendezvous))
+    print('Robots: {:>10}'.format(node_map.robots))
+
+
+def node_dictionary(dictionary, indent=0):
+    """
+    Print Dictionary to console in a readable fashion
+
+    :param d:
+        Dictionary to print
+    :param indent:
+    :return:
+    """
+    for key, value in dictionary.iteritems():
+        print '\t' * indent + str(key)
+        if isinstance(value, dict):
+            node_dictionary(value, indent+1)
+        else:
+            print '\t' * (indent+1) + str(value)
+
+
 def main():
     """
     Main Loop of Program
 
     :return:
     """
-    
+    intro = '-----------------------------------------\n' \
+            'Executing CP468 Final Project\n' \
+            'Created By:\n' \
+            '-----------------------------------------\n' \
+            'Shawn Cramp\n' \
+            'Edward Huang\n' \
+            'Bruno Salapic\n' \
+            'Konrad Bania\n' \
+            '-----------------------------------------\n' \
+            'Final Project Option 3\n' \
+            '-----------------------------------------\n' \
+            'Map Options:\n'
+
+    for line in intro:
+        sys.stdout.write(line)
+
+    base_dir = os.path.abspath(os.path.dirname(__file__))
+    map_files = os.listdir(base_dir + '\maps')
+
+    for i, map_file in enumerate(map_files):
+        print('{}: {}'.format(i+1, map_file))
+
+    selection = int(input('\nEnter desired map number: ')) - 1
+
+    print('-'*41)
+    print('Performing A* Search with map {}'.format(map_files[selection]))
+    print('-'*41)
+
     ''' Create Map Object '''
-    map_handle = 'maps/layoutmap.txt'
+    map_handle = 'maps/' + map_files[selection]
     
     ''' 2D Array of nodes in Map '''
     node_map = map_coordinates(map_handle)
-    print('Mapping Data: \n')
-    print('Width: {:>10}'.format(node_map.width))
-    print('Height: {:>10}'.format(node_map.height))
-    print('Rendezvous: {:>10}'.format(node_map.rendezvous))
-    print('Robots: {:>10}'.format(node_map.robots))
-    print('Dictionary:')
-    pretty(node_map.nodes)
-    print('-'*40 + '\n')
-    print('Performing A* Search...')
-    print('-'*40)
+
+    # print('Dictionary:')
+    # node_dictionary(node_map.nodes)
+
+    # print('-'*40 + '\n')
+
     robots = init_robots(node_map)
-    print('...')
-    print('-'*40)
-    print('A* Complete...')
-    print('Robot being Evaluated: {}'.format(node_map.robots[0]))
-    print('Rendezvous Node: {}'.format(node_map.rendezvous))
+    print('A* Completed on {} robot(s):'.format(len(node_map.robots)))
+    for i in robots:
+        print('Robot: {} -> {}'.format(i.start, i.finish))
+    # print('Robot being Evaluated: {}'.format(node_map.robots[0]))
+    # print('Rendezvous Node: {}'.format(node_map.rendezvous))
     print('-'*40)
 
+    print('Select next option...')
+    print('1: Puzzle Details')
+    print('2: Map Nodes and Children')
+
+    """
     for guy in robots:
         print('Evaluating Robot: {} -> {}'.format(guy.start, guy.finish))
         temp = copy.deepcopy(node_map.layout)
         # guy.pprint(temp)
         temp = copy.deepcopy(node_map)
         print('One Optimal Path:')
+        print('Path Cost: {}'.format(guy.path_cost))
         print(guy.backtrack_search(temp))
         # print(guy.cost_so_far.keys())
         print('-'*18)
-    
+    """
+
 
 """ Launch Main Program """
 main()
