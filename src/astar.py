@@ -410,21 +410,18 @@ def main():
 
     :return:
     """
-    intro = '-----------------------------------------\n' \
-            'Executing CP468 Final Project\n' \
-            'Created By:\n' \
-            '-----------------------------------------\n' \
-            'Shawn Cramp\n' \
-            'Edward Huang\n' \
-            'Bruno Salapic\n' \
-            'Konrad Bania\n' \
-            '-----------------------------------------\n' \
-            'Final Project Option 3\n' \
-            '-----------------------------------------\n' \
-            'Map Options:\n'
-
-    for line in intro:
-        sys.stdout.write(line)
+    print('-----------------------------------------\n'
+          'Executing CP468 Final Project\n'
+          'Created By:\n'
+          '-----------------------------------------\n'
+          'Shawn Cramp\n'
+          'Edward Huang\n'
+          'Bruno Salapic\n'
+          'Konrad Bania\n'
+          '-----------------------------------------\n'
+          'Final Project Option 3\n'
+          '-----------------------------------------\n'
+          'Map Options:\n')
 
     base_dir = os.path.abspath(os.path.dirname(__file__))
     map_files = os.listdir(base_dir + '\maps')
@@ -432,14 +429,14 @@ def main():
     for i, map_file in enumerate(map_files):
         print('{}: {}'.format(i+1, map_file))
 
-    selection = int(input('\nEnter desired map number: ')) - 1
+    map_selection = int(input('\nEnter desired map number: ')) - 1
 
     print('-'*41)
-    print('Performing A* Search with map {}'.format(map_files[selection]))
+    print('Performing A* Search with map {}'.format(map_files[map_selection]))
     print('-'*41)
 
     ''' Create Map Object '''
-    map_handle = 'maps/' + map_files[selection]
+    map_handle = 'maps/' + map_files[map_selection]
     
     ''' 2D Array of nodes in Map '''
     node_map = map_coordinates(map_handle)
@@ -457,9 +454,27 @@ def main():
     # print('Rendezvous Node: {}'.format(node_map.rendezvous))
     print('-'*40)
 
-    print('Select next option...')
-    print('1: Puzzle Details')
-    print('2: Map Nodes and Children')
+    exit_program = False
+    while not exit_program:
+
+        print('\nSelect next option...')
+        print('1: Puzzle Details')
+        print('2: Map Nodes and Children')
+        print('3: A* Search Results')
+
+        option = int(input('\nSelect an option: '))
+
+        if option == 1:
+            map_details(node_map)
+        elif option == 2:
+            pass
+        elif option == 3:
+            pass
+        else:
+            exit_program = True
+            break
+
+
 
     """
     for guy in robots:
