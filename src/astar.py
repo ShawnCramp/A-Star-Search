@@ -30,9 +30,11 @@ Import Declarations ------------------------------------- """
 import heapq
 import math
 import copy
-import sys
 import os
-import time
+
+""" ---------------------------------------------------------
+Global Declarations ------------------------------------- """
+TRAVEL_COST = 1  # Cost to travel from one node to the next
 
 
 """ ---------------------------------------------------------
@@ -40,6 +42,11 @@ Class Declarations -------------------------------------- """
 
 
 class PriorityQueue:
+    """
+    Priority Queue
+
+    Used to store nodes.
+    """
     def __init__(self):
         self._values = []
         
@@ -87,7 +94,7 @@ class Robot:
         self.came_from = came_from
         self.cost_so_far = cost_so_far
         
-    def backtrack_search(self, node_map):
+    def dijkstra(self, node_map):
         """
         Temp Comment
         """
@@ -118,7 +125,7 @@ class Robot:
     def pprint(self, layout):
         print('Node Costs')
         for key, val in self.cost_so_far.iteritems():
-            print('{}: {}'.format(key, val))
+            # print('{}: {}'.format(key, val))
             layout[key] = val
         
         array = []
@@ -127,12 +134,9 @@ class Robot:
             for j in range(0, 30):
                 temp.append(9)
             array.append(temp)
-            
-        for i in array:
-            print(i)
         
         for key, val in layout.iteritems():
-            print('{}: {}'.format(key, val))
+            # print('{}: {}'.format(key, val))
             array[key[0]][key[1]] = val
         
         print('Layout Map by Cost')
@@ -234,7 +238,6 @@ def map_coordinates(map_handle):
     robots = []
     
     ''' Initial Declarations.  These will be overwritten '''
-    node_dict = {}
     width = 0
     height = 0
     rendezvous = (0, 0)
@@ -332,7 +335,7 @@ def a_star(coordinates, robot, rendezvous):
         for node in coordinates.children(current_node):
             # print('Current: {}'.format(current_node))
             # print('Currently Evaling Child: {}'.format(node))
-            new_cost = cost_so_far[current_node] + 1
+            new_cost = cost_so_far[current_node] + TRAVEL_COST
             # print('New Cost for Node: {}'.format(new_cost))
             if node not in cost_so_far or new_cost < cost_so_far[node]:
                 # print('If Check: Passed')
@@ -391,7 +394,7 @@ def node_dictionary(dictionary, indent=0):
     """
     Print Dictionary to console in a readable fashion
 
-    :param d:
+    :param dictionary:
         Dictionary to print
     :param indent:
     :return:
@@ -402,6 +405,19 @@ def node_dictionary(dictionary, indent=0):
             node_dictionary(value, indent+1)
         else:
             print '\t' * (indent+1) + str(value)
+
+
+def print_paths(node_map, robots):
+    for guy in robots:
+        print('Evaluating Robot: {} -> {}'.format(guy.start, guy.finish))
+        temp = copy.deepcopy(node_map.layout)
+        guy.pprint(temp)
+        temp = copy.deepcopy(node_map)
+        print('One Optimal Path:')
+        print('Path Cost: {}'.format(guy.path_cost))
+        print(guy.dijkstra(temp))
+        # print(guy.cost_so_far.keys())
+        print('-'*18)
 
 
 def main():
@@ -441,17 +457,11 @@ def main():
     ''' 2D Array of nodes in Map '''
     node_map = map_coordinates(map_handle)
 
-    # print('Dictionary:')
-    # node_dictionary(node_map.nodes)
-
-    # print('-'*40 + '\n')
-
     robots = init_robots(node_map)
     print('A* Completed on {} robot(s):'.format(len(node_map.robots)))
     for i in robots:
         print('Robot: {} -> {}'.format(i.start, i.finish))
-    # print('Robot being Evaluated: {}'.format(node_map.robots[0]))
-    # print('Rendezvous Node: {}'.format(node_map.rendezvous))
+
     print('-'*40)
 
     exit_program = False
@@ -467,27 +477,12 @@ def main():
         if option == 1:
             map_details(node_map)
         elif option == 2:
-            pass
+            print('Dictionary:')
+            node_dictionary(node_map.nodes)
         elif option == 3:
-            pass
+            print_paths(node_map, robots)
         else:
-            exit_program = True
             break
-
-
-
-    """
-    for guy in robots:
-        print('Evaluating Robot: {} -> {}'.format(guy.start, guy.finish))
-        temp = copy.deepcopy(node_map.layout)
-        # guy.pprint(temp)
-        temp = copy.deepcopy(node_map)
-        print('One Optimal Path:')
-        print('Path Cost: {}'.format(guy.path_cost))
-        print(guy.backtrack_search(temp))
-        # print(guy.cost_so_far.keys())
-        print('-'*18)
-    """
 
 
 """ Launch Main Program """
