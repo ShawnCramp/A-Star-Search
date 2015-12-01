@@ -31,6 +31,8 @@ import heapq
 import math
 import copy
 import os
+import time
+import sys
 
 """ ---------------------------------------------------------
 Global Declarations ------------------------------------- """
@@ -122,19 +124,19 @@ class Robot:
         
         return list(reversed(pathing))
         
-    def pprint(self, layout):
+    def pprint(self, layout, width, height):
         print('Node Costs')
         for key, val in self.cost_so_far.iteritems():
             # print('{}: {}'.format(key, val))
             layout[key] = val
         
         array = []
-        for i in range(0, 20):
+        for i in range(0, height):
             temp = []
-            for j in range(0, 30):
+            for j in range(0, width):
                 temp.append(9)
             array.append(temp)
-        
+
         for key, val in layout.iteritems():
             # print('{}: {}'.format(key, val))
             array[key[0]][key[1]] = val
@@ -142,7 +144,9 @@ class Robot:
         print('Layout Map by Cost')
         print('#: Wall     . : UnExplored Floor Space\n')
         for i in array:
-            print('{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}{:>3}'.format(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9],i[10], i[11], i[12], i[13], i[14], i[15], i[16], i[17], i[18], i[19],i[20], i[21], i[22], i[23], i[24], i[25], i[26], i[27], i[28], i[29]))
+            for j in i:
+                sys.stdout.write('{:>3}'.format(j))
+            sys.stdout.write('\n')
 
 
 """ ---------------------------------------------------------
@@ -250,8 +254,8 @@ def map_coordinates(map_handle):
         
         if i == 0:  # when i is 0
             line = line.strip().split(" ")
-            width = line[0]
-            height = line[1]
+            width = line[1]
+            height = line[0]
             
         elif i == 1:  # when i is 1
             line = line.strip().split(" ")
@@ -400,18 +404,21 @@ def node_dictionary(dictionary, indent=0):
     :return:
     """
     for key, value in dictionary.iteritems():
-        print '\t' * indent + str(key)
+        print('\t' * indent + str(key))
         if isinstance(value, dict):
             node_dictionary(value, indent+1)
         else:
-            print '\t' * (indent+1) + str(value)
+            print('\t' * (indent+1) + str(value))
 
 
 def print_paths(node_map, robots):
     for guy in robots:
         print('Evaluating Robot: {} -> {}'.format(guy.start, guy.finish))
         temp = copy.deepcopy(node_map.layout)
-        guy.pprint(temp)
+        width = int(copy.deepcopy(node_map.width))
+        height = int(copy.deepcopy(node_map.height))
+        guy.pprint(temp, width, height)
+
         temp = copy.deepcopy(node_map)
         print('One Optimal Path:')
         print('Path Cost: {}'.format(guy.path_cost))
@@ -426,6 +433,7 @@ def main():
 
     :return:
     """
+
     print('-----------------------------------------\n'
           'Executing CP468 Final Project\n'
           'Created By:\n'
@@ -483,6 +491,16 @@ def main():
             print_paths(node_map, robots)
         else:
             break
+
+    print('-'*50)
+    time.sleep(1)
+    print('dummy text')
+    time.sleep(1)
+    print('more dummy')
+    time.sleep(1)
+    print('\n'*100)
+    time.sleep(1)
+    print('woah it worked?')
 
 
 """ Launch Main Program """
