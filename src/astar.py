@@ -411,20 +411,69 @@ def node_dictionary(dictionary, indent=0):
             print('\t' * (indent+1) + str(value))
 
 
+def optimal_print(layout, path, width, height, start, finish):
+        array = []
+        for i in range(0, height):
+            temp = []
+            for j in range(0, width):
+                temp.append(9)
+            array.append(temp)
+
+        for key, val in layout.iteritems():
+            array[key[0]][key[1]] = val
+
+        for pos, val in enumerate(path): 
+            if (pos + 1) < len(path):
+                next = path[pos + 1]
+            #  print('a: {}    b: {}'.format(val, next))
+            array[val[0]][val[1]] = direction(val, next, start, finish)
+            
+        print('Layout Map by Cost')
+        print('#: Wall     . : UnExplored Floor Space\n')
+        for i in array:
+            for j in i:
+                sys.stdout.write(j + ' ')
+            sys.stdout.write('\n')
+
+
 def print_paths(node_map, robots):
     for guy in robots:
         print('Evaluating Robot: {} -> {}'.format(guy.start, guy.finish))
-        temp = copy.deepcopy(node_map.layout)
+        layout = copy.deepcopy(node_map.layout)
         width = int(copy.deepcopy(node_map.width))
         height = int(copy.deepcopy(node_map.height))
-        guy.pprint(temp, width, height)
+        guy.pprint(layout, width, height)
 
-        temp = copy.deepcopy(node_map)
+        layout = copy.deepcopy(node_map.layout)
+        mapping = copy.deepcopy(node_map)
         print('One Optimal Path:')
         print('Path Cost: {}'.format(guy.path_cost))
-        print(guy.dijkstra(temp))
+        optimal_path = guy.dijkstra(mapping)
+        print(optimal_path)
+        print('Optimal Path Only:')
+        print(guy.start)
+        print(guy.finish)
+        optimal_print(layout, optimal_path, width, height, guy.start, guy.finish)
         # print(guy.cost_so_far.keys())
         print('-'*18)
+        
+        
+def direction(a, b, start, finish):
+    if (a[0] < b[0]):  # Down
+        direction = u'\u2193'
+    elif (a[0] > b[0]):  # Up
+        direction = u'\u2191'
+    elif (a[1] > b[1]):  # Left
+        direction = u'\u2190'
+    elif (a[1] < b[1]):  # Right
+        direction = u'\u2192'
+        
+    if a == start:
+        direction = 'S'
+    elif a == finish:
+        direction = 'F'
+    
+    return direction
 
 
 def main():
@@ -447,6 +496,7 @@ def main():
           '-----------------------------------------\n'
           'Map Options:\n')
 
+    ''' Create File list '''
     base_dir = os.path.abspath(os.path.dirname(__file__))
     map_files = os.listdir(base_dir + '\maps')
 
@@ -465,6 +515,7 @@ def main():
     ''' 2D Array of nodes in Map '''
     node_map = map_coordinates(map_handle)
 
+    ''' Display Robots Created '''
     robots = init_robots(node_map)
     print('A* Completed on {} robot(s):'.format(len(node_map.robots)))
     for i in robots:
@@ -472,6 +523,7 @@ def main():
 
     print('-'*40)
 
+    ''' Program Options Loop '''
     exit_program = False
     while not exit_program:
 
@@ -493,14 +545,6 @@ def main():
             break
 
     print('-'*50)
-    time.sleep(1)
-    print('dummy text')
-    time.sleep(1)
-    print('more dummy')
-    time.sleep(1)
-    print('\n'*100)
-    time.sleep(1)
-    print('woah it worked?')
 
 
 """ Launch Main Program """
