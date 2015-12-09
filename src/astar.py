@@ -1,3 +1,4 @@
+
 """ ---------------------------------------------------------
 Author: Shawn Cramp
 ID: 111007290
@@ -13,10 +14,10 @@ Date: November, 13th, 2015
 -------------------------------------------------------------
 Assignment Task:
 
-The purpose of this CP468 term project is to design and implement an 
+The purpose of this CP468 term project is to design and implement an
 A*-based algorithm to solve a path planning problem. You can use
  the programming language of your choice
- 
+
 Consider a Museum room that is patrolled by N robots at night.
 At a pre-determined time, the robots are supposed to rendezvous
 at a given point R in the room. The robots move inside the room,
@@ -33,6 +34,7 @@ import copy
 import os
 import time
 import sys
+
 
 """ ---------------------------------------------------------
 Global Declarations ------------------------------------- """
@@ -51,16 +53,16 @@ class PriorityQueue:
     """
     def __init__(self):
         self._values = []
-        
+
     def empty(self):
         return len(self._values) == 0
-    
+
     def length(self):
         return len(self._values)
-    
+
     def put(self, item, priority):
         heapq.heappush(self._values, (priority, item))
-        
+
     def get(self):
         return heapq.heappop(self._values)[1]
 
@@ -80,7 +82,7 @@ class Map:
 
     def children(self, node):
         return self.nodes[node]
-    
+
 
 class Robot:
     """
@@ -95,7 +97,7 @@ class Robot:
         self.path_cost = path_cost
         self.came_from = came_from
         self.cost_so_far = cost_so_far
-        
+
     def dijkstra(self, node_map):
         """
         Temp Comment
@@ -132,15 +134,18 @@ class Robot:
                         # print('If Check: Failed')
             distance -= 1
             # print('-'*18)
-        
+
         return list(reversed(pathing))
-        
+
     def pprint(self, layout, width, height):
+        """
+
+        """
         print('Node Costs')
         for key, val in self.cost_so_far.iteritems():
             # print('{}: {}'.format(key, val))
             layout[key] = val
-        
+
         array = []
         for i in range(0, height):
             temp = []
@@ -151,7 +156,7 @@ class Robot:
         for key, val in layout.iteritems():
             # print('{}: {}'.format(key, val))
             array[key[0]][key[1]] = val
-        
+
         print('Layout Map by Cost')
         print('#: Wall     . : UnExplored Floor Space\n')
         for i in array:
@@ -232,7 +237,7 @@ def build_dictionary(node_set):
     layout = {}
 
     for x, x_line in enumerate(node_set):
-        for y, y_line in enumerate(x_line):      
+        for y, y_line in enumerate(x_line):
             if node_set[x][y] == 0:
                 layout[(x, y)] = '.'  # for drawing
                 children = get_children(node_set, x, y)
@@ -255,7 +260,7 @@ def map_coordinates(map_handle):
 
     ''' List of Robots '''
     robots = []
-    
+
     ''' Initial Declarations.  These will be overwritten '''
     width = 0
     height = 0
@@ -263,25 +268,25 @@ def map_coordinates(map_handle):
 
     ''' 2D Array to initialize nodes '''
     temp = []
-    
+
     ''' Build Map Object '''
-    for i, line in enumerate(open(map_handle)):
-        
+    for i, line in enumerate(open(map_handle, 'r')):
+
         if i == 0:  # when i is 0
             line = line.strip().split(" ")
             width = line[1]
             height = line[0]
-            
+
         elif i == 1:  # when i is 1
             line = line.strip().split(" ")
             robot_count = int(line[0])
-            
+
         elif i - 2 < robot_count:
             robots.append(tuple(map(int, line.strip().split(" "))))
-            
+
         elif i == 2 + robot_count:
             rendezvous = tuple(map(int, line.strip().split(" ")))
-            
+
         else:
             temp.append(map(int, line.strip()))
 
@@ -380,7 +385,11 @@ def a_star(coordinates, robot, rendezvous):
 
 def init_robots(node_map):
     """
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 4ea83ae2feac247d47021c295b6599daf8dacc5d
     """
     robots = []
     for robot_start in node_map.robots:
@@ -409,6 +418,11 @@ proceed and view the code output he/she would like to view.
 
 
 def map_details(node_map):
+    """
+
+    :param node_map:
+    :return:
+    """
     print('Mapping Data: \n')
     print('Width: {:>10}'.format(node_map.width))
     print('Height: {:>10}'.format(node_map.height))
@@ -470,6 +484,12 @@ def optimal_print(layout, path, width, height, start, finish):
 
 
 def print_paths(node_map, robots):
+    """
+
+    :param node_map:
+    :param robots:
+    :return:
+    """
     for guy in robots:
         print('Evaluating Robot: {} -> {}'.format(guy.start, guy.finish))
         layout = copy.deepcopy(node_map.layout)
@@ -489,8 +509,8 @@ def print_paths(node_map, robots):
         optimal_print(layout, optimal_path, width, height, guy.start, guy.finish)
         # print(guy.cost_so_far.keys())
         print('-'*18)
-        
-        
+
+
 def direction(a, b, start, finish):
     if (a[0] < b[0]):  # Down
         direction = 'V'
@@ -500,12 +520,12 @@ def direction(a, b, start, finish):
         direction = '<'
     elif (a[1] < b[1]):  # Right
         direction = '>'
-        
+    
     if a == start:
         direction = 'S'
     elif a == finish:
         direction = 'F'
-    
+
     return direction
 
 
@@ -544,7 +564,7 @@ def main():
 
     ''' Create Map Object '''
     map_handle = 'maps/' + map_files[map_selection]
-    
+
     ''' 2D Array of nodes in Map '''
     node_map = map_coordinates(map_handle)
 
