@@ -100,16 +100,27 @@ class Robot:
         """
         Temp Comment
         """
+        dijkstra_stuff = 0
+        sys.stdout.write('\r {}%'.format(dijkstra_stuff))
+        
         distance = copy.deepcopy(self.path_cost)
+        
+        distance_calc = copy.deepcopy(self.path_cost)
+        
         node = copy.deepcopy(self.finish)
         pathing = [node]
         while distance != -1:
+            
+            sys.stdout.write('\r {}% Completed...'.format((dijkstra_stuff*1.0 / distance_calc*1.0) * 100))
+            dijkstra_stuff += 1
+            
             node = pathing[-1]
             # print('Checking Children of Node: {}'.format(node))
             # print('Distance: {}'.format(distance))
             children = node_map.children(node)
             # print('Node Children: {}'.format(children))
             for child in children:
+                
                 if child in self.cost_so_far.keys():
                     # print('Child Cost: {}: {}'.format(child, self.cost_so_far[child]))
                     if self.cost_so_far[child] == distance:
@@ -145,7 +156,11 @@ class Robot:
         print('#: Wall     . : UnExplored Floor Space\n')
         for i in array:
             for j in i:
-                sys.stdout.write('{:>3}'.format(j))
+                if j == '#':
+                    sys.stdout.write('|')
+                    sys.stdout.write(' ')
+                else:
+                    sys.stdout.write('{} '.format(j))
             sys.stdout.write('\n')
 
 
@@ -364,10 +379,17 @@ def a_star(coordinates, robot, rendezvous):
 
 
 def init_robots(node_map):
+    """
+    
+    """
     robots = []
     for robot_start in node_map.robots:
-        came_from, cost_so_far = a_star(node_map, robot_start, node_map.rendezvous)
-        robots.append(Robot(robot_start, node_map.rendezvous, came_from, cost_so_far, cost_so_far[node_map.rendezvous]))
+        if robot_start in node_map.nodes:
+            print('{} initialized'.format(robot_start))
+            came_from, cost_so_far = a_star(node_map, robot_start, node_map.rendezvous)
+            robots.append(Robot(robot_start, node_map.rendezvous, came_from, cost_so_far, cost_so_far[node_map.rendezvous]))
+        else:
+            print('Robot Location Invalid')
 
     return robots
 
@@ -412,28 +434,39 @@ def node_dictionary(dictionary, indent=0):
 
 
 def optimal_print(layout, path, width, height, start, finish):
+        output_file = open('output/output{}.txt'.format(start), 'w')
+    
         array = []
         for i in range(0, height):
             temp = []
             for j in range(0, width):
                 temp.append(9)
             array.append(temp)
-
+        
         for key, val in layout.iteritems():
             array[key[0]][key[1]] = val
-
+        
         for pos, val in enumerate(path): 
             if (pos + 1) < len(path):
                 next = path[pos + 1]
+                
             #  print('a: {}    b: {}'.format(val, next))
             array[val[0]][val[1]] = direction(val, next, start, finish)
             
         print('Layout Map by Cost')
         print('#: Wall     . : UnExplored Floor Space\n')
-        for i in array:
+        for i in array:  
             for j in i:
-                sys.stdout.write(j + ' ')
-            sys.stdout.write('\n')
+                if j == '#':
+                    #sys.stdout.write(u'\u25A0')
+                    #sys.stdout.write(' ')
+                    output_file.write('|')
+                    output_file.write(' ')
+                else:
+                    #sys.stdout.write(j + ' ')
+                    output_file.write(j + ' ')
+            #sys.stdout.write('\n')
+            output_file.write('\n')
 
 
 def print_paths(node_map, robots):
@@ -442,7 +475,7 @@ def print_paths(node_map, robots):
         layout = copy.deepcopy(node_map.layout)
         width = int(copy.deepcopy(node_map.width))
         height = int(copy.deepcopy(node_map.height))
-        guy.pprint(layout, width, height)
+        # guy.pprint(layout, width, height)
 
         layout = copy.deepcopy(node_map.layout)
         mapping = copy.deepcopy(node_map)
@@ -460,13 +493,13 @@ def print_paths(node_map, robots):
         
 def direction(a, b, start, finish):
     if (a[0] < b[0]):  # Down
-        direction = u'\u2193'
+        direction = 'V'
     elif (a[0] > b[0]):  # Up
-        direction = u'\u2191'
+        direction = '^'
     elif (a[1] > b[1]):  # Left
-        direction = u'\u2190'
+        direction = '<'
     elif (a[1] < b[1]):  # Right
-        direction = u'\u2192'
+        direction = '>'
         
     if a == start:
         direction = 'S'
