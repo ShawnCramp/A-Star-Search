@@ -5,7 +5,7 @@ Using A* Search, for a robot at specified starting coordinates, find the best pa
 Usage
 =====================
 
-'''
+```
 8 10          # Map Dimentions
 2             # Number of Robots
 2 1           # Robot 1 Start Position
@@ -19,4 +19,4 @@ Usage
 0001111000
 0000110000
 1100000011
-'''
+```
